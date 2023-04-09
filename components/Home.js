@@ -8,6 +8,7 @@ import styles from '../styles/Home.module.css';
 
 function Home() {
   const [likedMovies, setLikedMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true)
 
   // Liked movies (inverse data flow)
   const updateLikedMovies = (movieTitle) => {
@@ -37,10 +38,26 @@ function Home() {
 
   const [moviesData, setMoviesData] = useState([]);
 
-  useEffect(()=>{fetch('http://localhost:3000/movies')
+  useEffect(()=>{fetch('https://mymoviz-back-pi.vercel.app/movies')
     .then(response => response.json())
-    .then(dat => setMoviesData(dat))
+    .then(dat => {
+      if (dat) setMoviesData(dat)
+      setIsLoading(false)})
+      .catch((error) => {
+        console.log("error", error);
+        setIsLoading(false);
+      })
   },[]);
+  // useEffect(()=>{fetch('http://localhost:3000/movies')
+  //   .then(response => response.json())
+  //   .then(dat => {
+  //     if (dat) setMoviesData(dat)
+  //     setIsLoading(false)})
+  //     .catch((error) => {
+  //       console.log("error", error);
+  //       setIsLoading(false);
+  //     })
+  // },[]);
 
   console.log("front"+ moviesData)
 
@@ -50,6 +67,13 @@ function Home() {
     const isLiked = likedMovies.some(movie => movie === data.original_title);
     return <Movie key={i} updateLikedMovies={updateLikedMovies} isLiked={isLiked} title={data.title} overview={data.overview} poster={data.poster_path} voteAverage={data.vote_average} voteCount={data.vote_count} />;
   });
+  if (isLoading) {
+    return (
+      <div>
+        Loading...
+      </div>
+    )
+  }
 
   return (
     <div className={styles.main}>
